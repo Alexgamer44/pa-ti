@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Gabriela 💖</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{background:black;overflow:hidden;color:white}
+
+canvas{position:fixed;inset:0}
+
+/* CONTENIDO */
+#contenido{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  gap:50px;z-index:10;
+  transition:opacity 1.5s ease;
+}
+
+h1{text-align:center;font-size:clamp(40px,7vw,80px);text-shadow:0 0 20px white}
+.botones{display:flex;gap:80px}
+
+button{
+  padding:18px 48px;font-size:26px;
+  border:none;border-radius:50px;
+  background:#ff4fa3;color:white;
+  cursor:pointer;
+  box-shadow:0 0 25px rgba(255,105,180,.8);
+}
+
+/* TEXTO */
+.texto{
+  position:fixed;top:-30%;left:50%;
+  transform:translateX(-50%);
+  font-size:clamp(32px,6vw,64px);
+  opacity:0;
+  text-shadow:0 0 15px white;
+}
+
+/* FINAL */
+#final,#finalNo{
+  display:none;
+  position:fixed;inset:0;
+  align-items:center;justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  font-size:clamp(28px,6vw,60px);
+  z-index:30;
+}
+#final{color:pink;text-shadow:0 0 50px pink}
+#finalNo{background:black;color:white}
+
+/* CORAZONES */
+.corazon{
+  position:fixed;
+  color:pink;
+  font-size:24px;
+  animation:flotar 6s linear forwards;
+  pointer-events:none;
+}
+@keyframes flotar{
+  from{transform:translateY(0);opacity:1}
+  to{transform:translateY(-120vh);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="estrellas"></canvas>
+<canvas id="aurora"></canvas>
+
+<div id="contenido">
+  <h1>Gabriela 💖<br>¿Quieres ser mi novia?</h1>
+  <div class="botones">
+    <button id="si">SÍ 💘</button>
+    <button id="no">NO 💔</button>
+  </div>
+</div>
+
+<div id="final">
+  💞 Gracias por existir 💞
+  <span>Este momento lo guardaré siempre en mi corazón</span>
+  <span>Te quiero mucho 💖</span>
+</div>
+
+<div id="finalNo">
+  Soldado...<br>Su misión ha terminado 🪖
+</div>
+
+<audio id="musica" loop>
+  <source src="https://cdn.pixabay.com/audio/2022/10/03/audio_7b8b6d7c66.mp3" type="audio/mp3">
+</audio>
+
+<!-- EMAILJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+emailjs.init("SCOQ0i6-SMrrRjJb6");
+</script>
+
+<script>
+/* ================= EMAIL ================= */
+let respondio=false;
+let temporizador=setTimeout(()=>{
+  if(!respondio){
+    enviarCorreo("Respuesta","Gabriela dice que no o se está decidiendo");
+  }
+},45000);
+
+function enviarCorreo(asunto,mensaje){
+  emailjs.send("service_jfyvwvv","template_pynafm1",{subject:asunto,message:mensaje});
+}
+
+/* ================= CANVAS ================= */
+const est=estrellas, ect=est.getContext("2d");
+const aur=aurora, act=aur.getContext("2d");
+function resize(){est.width=aur.width=innerWidth;est.height=aur.height=innerHeight}
+resize();onresize=resize;
+
+/* ESTRELLAS */
+let stars=[...Array(80)].map(()=>({x:Math.random()*est.width,y:Math.random()*est.height,s:Math.random()*1.5+.5}));
+let starsOn=false;
+function animStars(){
+  if(!starsOn)return;
+  ect.clearRect(0,0,est.width,est.height);
+  ect.fillStyle="white";
+  stars.forEach(e=>{
+    e.y+=e.s;if(e.y>est.height){e.y=0;e.x=Math.random()*est.width}
+    ect.fillRect(e.x,e.y,e.s,e.s);
+  });
+  requestAnimationFrame(animStars);
+}
+
+/* AURORA */
+let auroraOn=false,auroraAlpha=0;
+function animAurora(){
+  if(!auroraOn)return;
+  act.clearRect(0,0,aur.width,aur.height);
+  auroraAlpha=Math.min(auroraAlpha+.002,.35);
+  const g=act.createLinearGradient(0,0,aur.width,aur.height);
+  g.addColorStop(0,`rgba(0,255,180,${auroraAlpha})`);
+  g.addColorStop(.5,`rgba(140,100,255,${auroraAlpha})`);
+  g.addColorStop(1,`rgba(0,100,255,${auroraAlpha})`);
+  act.fillStyle=g;act.fillRect(0,0,aur.width,aur.height);
+  requestAnimationFrame(animAurora);
+}
+
+/* CORAZONES */
+let corazonesInt;
+function iniciarCorazones(){
+  corazonesInt=setInterval(()=>{
+    const c=document.createElement("div");
+    c.className="corazon";
+    c.textContent="💖";
+    c.style.left=Math.random()*100+"vw";
+    c.style.bottom="-20px";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),6000);
+  },400);
+}
+function pararCorazones(){clearInterval(corazonesInt);}
+
+/* TEXTOS */
+const textos=[
+"Motivos por los que quiero estar contigo",
+"Eres preciosa ✨","Tu sonrisa enamora 💕","Iluminas mi mundo 🌟",
+"Eres única 💖","Me haces feliz 😊","Mi lugar favorito eres tú 🌍"
+];
+
+function texto(txt,d,primero=false,i=1){
+  return new Promise(r=>{
+    const t=document.createElement("div");
+    t.className="texto";t.textContent=txt;
+    t.style.textShadow=`0 0 ${15+i*8}px white`;
+    document.body.appendChild(t);
+    const dur=primero?d+2500:d;
+    const centro=primero?"45%":"40%";
+    t.animate([
+      {top:"-30%",opacity:0},
+      {top:centro,opacity:1},
+      {top:centro,opacity:1},
+      {top:"110%",opacity:0}
+    ],{duration:dur,easing:"ease-in-out"});
+    setTimeout(()=>{t.remove();r()},dur);
+  });
+}
+
+/* ================= BOTÓN SÍ ================= */
+si.onclick=async()=>{
+  if(respondio)return;
+  respondio=true;
+  clearTimeout(temporizador);
+
+  enviarCorreo("Sí","Gabriela dijo Sí");
+
+  contenido.style.opacity=0;
+  musica.volume=0;musica.play();
+  const fadeIn=setInterval(()=>{musica.volume=Math.min(musica.volume+.02,.6)},100);
+
+  starsOn=true;animStars();
+  await texto(textos[0],4000,true,1);
+
+  auroraOn=true;animAurora();iniciarCorazones();
+
+  for(let i=1;i<textos.length;i++){
+    stars.push({x:Math.random()*est.width,y:Math.random()*est.height,s:Math.random()*2+.5});
+    await texto(textos[i],2000,false,i);
+  }
+
+  pararCorazones();
+  let fade=setInterval(()=>{
+    auroraAlpha-=.01;
+    musica.volume-=.02;
+    if(auroraAlpha<=0){
+      auroraOn=false;starsOn=false;
+      musica.pause();
+      clearInterval(fade);
+    }
+  },50);
+
+  setTimeout(()=>final.style.display="flex",document.body.style.background="black",2500);
+};
+
+/* ================= BOTÓN NO ================= */
+no.onclick=()=>{
+  if(respondio)return;
+  respondio=true;
+  clearTimeout(temporizador);
+
+  enviarCorreo("No","Gabriela ha dicho que no");
+
+  musica.pause();
+  contenido.style.opacity=0;
+
+  setTimeout(()=>{
+    document.body.style.background="black";
+    finalNo.style.display="flex";
+  },1500);
+};
+</script>
+
+</body>
+</html>
