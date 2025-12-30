@@ -49,7 +49,7 @@ button{
   font-size:clamp(28px,6vw,60px);
   z-index:30;
 }
-#final{color:pink;text-shadow:0 0 50px pink}
+#final{background:black;color:pink;text-shadow:0 0 50px pink}
 #finalNo{background:black;color:white}
 
 /* CORAZONES */
@@ -91,7 +91,11 @@ button{
 </div>
 
 <audio id="musica" loop>
-  <source src="https://cdn.pixabay.com/audio/2022/10/03/audio_7b8b6d7c66.mp3" type="audio/mp3">
+  <source src="https://cdn.discordapp.com/attachments/1318992828042448947/1455593952110575656/guitar-mexican-romantic-318464.mp3?ex=69554b01&is=6953f981&hm=32c39e21a4ba49052cca58b2f127e814a103f0e87f60cead854ff257d1deda3f&" type="audio/mp3">
+</audio>
+
+<audio id="musicasad" loop>
+  <source src="https://cdn.discordapp.com/attachments/1318992828042448947/1455596903675723868/sleep-16009.mp3?ex=69554dc1&is=6953fc41&hm=639df5850d456b7cd4218ac2cdd16704599107c6b2f1d0031301511d5d915d48&" type="audio/mp3">
 </audio>
 
 <!-- EMAILJS -->
@@ -220,7 +224,10 @@ si.onclick=async()=>{
     }
   },50);
 
-  setTimeout(()=>final.style.display="flex",document.body.style.background="black",2500);
+  setTimeout(()=>{
+    document.body.style.background="black";
+    final.style.display="flex";
+  },2500);
 };
 
 /* ================= BOTÓN NO ================= */
@@ -232,6 +239,7 @@ no.onclick=()=>{
   enviarCorreo("No","Gabriela ha dicho que no");
 
   musica.pause();
+  musicasad.volume=0.1;musicasad.play();
   contenido.style.opacity=0;
 
   setTimeout(()=>{
